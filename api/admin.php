@@ -65,6 +65,19 @@ $items = $pdo->query("SELECT * FROM menu_items ORDER BY created_at DESC")->fetch
                 <th>Action</th>
             </tr>
             <?php foreach ($items as $item): ?>
+
+            // Inside your foreach loop in admin.php
+            echo "<tr>
+                <td>{$row['name']}</td>
+                <td>{$row['category']}</td>
+                <td><input type='number' class='price-input' data-id='{$row['id']}' value='{$row['price']}'></td>
+                <td><img src='{$row['image_url']}' width='50' onmouseover='preview(this.src)'></td>
+                <td>
+                    <button onclick='updatePrice({$row['id']})'>Save</button>
+                    <button onclick='deleteProduct({$row['id']})' style='color:red'>Delete</button>
+                </td>
+            </tr>";
+            
             <tr>
                 <td><?php echo htmlspecialchars($item['name']); ?></td>
                 <td><?php echo htmlspecialchars($item['category']); ?></td>
