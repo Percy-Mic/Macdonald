@@ -29,7 +29,7 @@ $items = $pdo->query("SELECT * FROM menu_items ORDER BY created_at DESC")->fetch
 <head>
     <meta charset="UTF-8">
     <title>McExpress Admin</title>
-    <link rel="stylesheet" href="styles/admin.css"> </head>
+    <link rel="stylesheet" href="/styles/admin.css"> </head>
 <body>
     <h1>McExpress Management</h1>
     
