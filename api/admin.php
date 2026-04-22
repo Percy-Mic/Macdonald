@@ -26,7 +26,7 @@ if (isset($_POST['update_price'])) {
 <head>
     <meta charset="UTF-8">
     <title>McExpress Admin | Inventory</title>
-    <link rel="stylesheet" href="/../admin.css">
+    <link rel="stylesheet" href="/styles/admin.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
