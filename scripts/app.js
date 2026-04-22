@@ -87,6 +87,23 @@ async function updatePrice(id) {
     }
 }
 
+async function savePrice(id) {
+    const newPrice = document.getElementById(`price-${id}`).value;
+
+    const response = await fetch('/api/update_price.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, price: newPrice })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+        alert("Price updated successfully!");
+    } else {
+        alert("Error: " + result.error);
+    }
+}
+
 // Client Reminder Logic
 if (document.title.includes("Order Now")) {
     setTimeout(() => {
