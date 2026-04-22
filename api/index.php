@@ -1,11 +1,11 @@
-<?php include 'api/db.php'; ?>
+<?php include 'db.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>McExpress | Order Now</title>
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="/styles/main.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -49,6 +49,6 @@
         </div>
     </aside>
 
-    <script src="scripts/app.js"></script>
+    <script src="/scripts/app.js"></script>
 </body>
 </html>
