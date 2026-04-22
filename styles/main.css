@@ -1,0 +1,17 @@
+:root { --red: #da291c; --yellow: #ffbc0d; --dark: #27251f; }
+body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f4f4; color: var(--dark); }
+.navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+.logo { font-size: 24px; font-weight: 900; color: var(--red); margin: 0; }
+.logo span { color: var(--yellow); }
+.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 40px 5%; }
+.card { background: white; border-radius: 20px; overflow: hidden; transition: 0.3s; border: 1px solid #eee; }
+.card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+.card img { width: 100%; height: 200px; object-fit: cover; }
+.card-info { padding: 20px; text-align: center; }
+.price { font-size: 22px; font-weight: 900; color: var(--red); margin: 10px 0; }
+.card button { background: var(--yellow); border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.card button:hover { background: var(--red); color: white; }
+.sidebar { position: fixed; right: 0; top: 0; height: 100%; width: 380px; background: white; transform: translateX(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; box-shadow: -10px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+.sidebar.active { transform: translateX(0); }
+.notification-area { position: fixed; top: 20px; right: 20px; z-index: 2000; }
+.toast { background: var(--dark); color: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 10px; border-left: 6px solid var(--yellow); font-weight: bold; }
