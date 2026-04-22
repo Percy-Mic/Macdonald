@@ -1,6 +1,6 @@
 <?php
 // Fix: Use the correct path since admin.php is in the root or same folder as db.php
-include 'api/db.php'; 
+include 'db.php'; 
 
 $message = "";
 
