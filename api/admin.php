@@ -1,5 +1,4 @@
 <?php
-// Fix: Use the correct path since admin.php is in the root or same folder as db.php
 include 'db.php'; 
 
 $message = "";
@@ -20,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_item'])) {
     }
 }
 
-// Fetch current items to display
+// Fetch current items
 $items = $pdo->query("SELECT * FROM menu_items ORDER BY created_at DESC")->fetchAll();
 ?>
 
@@ -29,7 +28,8 @@ $items = $pdo->query("SELECT * FROM menu_items ORDER BY created_at DESC")->fetch
 <head>
     <meta charset="UTF-8">
     <title>McExpress Admin</title>
-    <link rel="stylesheet" href="/styles/admin.css"></head>
+    <link rel="stylesheet" href="/styles/admin.css">
+</head>
 <body>
     <h1>McExpress Management</h1>
     
@@ -58,34 +58,43 @@ $items = $pdo->query("SELECT * FROM menu_items ORDER BY created_at DESC")->fetch
     <section>
         <h2>Current Menu</h2>
         <table border="1">
-            <tr>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-            <?php foreach ($items as $item): ?>
-
-            // Inside your foreach loop in admin.php
-            echo "<tr>
-                <td>{$row['name']}</td>
-                <td>{$row['category']}</td>
-                <td><input type='number' class='price-input' data-id='{$row['id']}' value='{$row['price']}'></td>
-                <td><img src='{$row['image_url']}' width='50' onmouseover='preview(this.src)'></td>
-                <td>
-                    <button onclick='updatePrice({$row['id']})'>Save</button>
-                    <button onclick='deleteProduct({$row['id']})' style='color:red'>Delete</button>
-                </td>
-            </tr>";
-            
-            <tr>
-                <td><?php echo htmlspecialchars($item['name']); ?></td>
-                <td><?php echo htmlspecialchars($item['category']); ?></td>
-                <td>₱<?php echo number_format($item['price'], 2); ?></td>
-                <td><button>Delete</button></td>
-            </tr>
-            <?php endforeach; ?>
+            <thead>
+                <tr>
+                    <th>Preview</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($items as $item): ?>
+                <tr>
+                    <td>
+                        <img src="<?php echo htmlspecialchars($item['image_url']); ?>" 
+                             alt="item" width="50" 
+                             style="border-radius: 5px;">
+                    </td>
+                    <td><?php echo htmlspecialchars($item['name']); ?></td>
+                    <td><?php echo htmlspecialchars($item['category']); ?></td>
+                    <td>
+                        ₱<input type="number" 
+                                step="0.01" 
+                                class="price-input" 
+                                id="price-<?php echo $item['id']; ?>" 
+                                value="<?php echo $item['price']; ?>" 
+                                style="width: 80px;">
+                    </td>
+                    <td>
+                        <button onclick="updatePrice(<?php echo $item['id']; ?>)">Save</button>
+                        <button onclick="deleteProduct(<?php echo $item['id']; ?>)" style="color:red">Delete</button>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
         </table>
     </section>
+
+    <script src="/scripts/app.js"></script>
 </body>
 </html>
