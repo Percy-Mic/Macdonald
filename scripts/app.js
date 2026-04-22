@@ -57,6 +57,36 @@ function processOrder() {
     toggleCart();
 }
 
+// DELETE FUNCTION
+async function deleteProduct(id) {
+    if (!confirm('Are you sure you want to delete this?')) return;
+
+    const response = await fetch(`/api/delete_product.php?id=${id}`, { method: 'DELETE' });
+    const result = await response.json();
+    
+    if (result.success) {
+        location.reload(); // Refresh to show updated list
+    } else {
+        alert('Delete failed: ' + result.error);
+    }
+}
+
+// UPDATE PRICE FUNCTION
+async function updatePrice(id) {
+    const input = document.querySelector(`.price-input[data-id='${id}']`);
+    const newPrice = input.value;
+
+    const response = await fetch('/api/update_price.php', {
+        method: 'POST',
+        body: JSON.stringify({ id: id, price: newPrice }),
+        headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (response.ok) {
+        alert('Price updated!');
+    }
+}
+
 // Client Reminder Logic
 if (document.title.includes("Order Now")) {
     setTimeout(() => {
