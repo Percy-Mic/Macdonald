@@ -5,18 +5,21 @@
     }
   },
   "routes": [
-    { "src": "/styles/(.*)", "dest": "/styles/$1" },
-    { "src": "/scripts/(.*)", "dest": "/scripts/$1" },
-    
+    /* 1. ALLOW DIRECT ACCESS TO STATIC ASSETS FIRST *
+    { "handle": "filesystem" },
+
+    /* 2. SPECIFIC CLEAN URLS FOR ADMIN */
     { "src": "/admin/login", "dest": "/api/login.php" },
     { "src": "/admin/products", "dest": "/api/admin.php" },
     { "src": "/admin/orders", "dest": "/api/admin_orders.php" },
     { "src": "/admin/staff", "dest": "/api/admin_staff.php" },
     { "src": "/admin/settings", "dest": "/api/change_password.php" },
     { "src": "/logout", "dest": "/api/logout.php" },
-    
-    { "src": "/admin", "dest": "/api/admin.php" },
+
+    /* 3. API ENDPOINTS */
     { "src": "/api/(.*)", "dest": "/api/$1" },
+
+    /* 4. CATCH-ALL FOR STOREFRONT (MUST BE LAST) */
     { "src": "/(.*)", "dest": "/api/index.php" }
   ]
 }
