@@ -1,53 +1,50 @@
 {
-
-
-
+  "version": 2,
   "functions": {
-
-
-
     "api/*.php": {
-
-
-
       "runtime": "vercel-php@0.7.1"
-
-
-
     }
-
-
-
   },
-
-
-
   "routes": [
-
-
-
-    { "src": "/styles/(.*)", "dest": "/styles/$1" },
-
-
-
-    { "src": "/scripts/(.*)", "dest": "/scripts/$1" },
-
-
-
-    { "src": "/admin", "dest": "/api/admin.php" },
-
-
-
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-
-
-
-    { "src": "/(.*)", "dest": "/api/index.php" }
-
-
-
+    {
+      "src": "/styles/(.*)",
+      "dest": "/styles/$1"
+    },
+    {
+      "src": "/scripts/(.*)",
+      "dest": "/scripts/$1"
+    },
+    {
+      "src": "/admin/login",
+      "dest": "/api/login.php"
+    },
+    {
+      "src": "/admin/products",
+      "dest": "/api/admin.php"
+    },
+    {
+      "src": "/admin/orders",
+      "dest": "/api/admin_orders.php"
+    },
+    {
+      "src": "/admin/staff",
+      "dest": "/api/admin_staff.php"
+    },
+    {
+      "src": "/admin/settings",
+      "dest": "/api/change_password.php"
+    },
+    {
+      "src": "/logout",
+      "dest": "/api/logout.php"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
+    }
   ]
-
-
-
 }
