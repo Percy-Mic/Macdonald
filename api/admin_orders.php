@@ -1,44 +1,95 @@
 <?php 
+// 1. Protection & Connection
 include 'auth_check.php'; 
 include 'db.php';
-$orders = $pdo->query("SELECT * FROM orders ORDER BY created_at DESC")->fetchAll();
+
+// 2. Fetch Orders (Newest First)
+try {
+    $stmt = $pdo->query("SELECT * FROM orders ORDER BY created_at DESC");
+    $orders = $stmt->fetchAll();
+} catch (PDOException $e) {
+    die("Error fetching orders: " . $e->getMessage());
+}
 ?>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Incoming Orders</title>
+    <meta charset="UTF-8">
+    <title>Live Orders | McExpress Admin</title>
     <link rel="stylesheet" href="/styles/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+
     <?php include 'sidebar.php'; ?>
-    <div class="content">
-        <h1>Live Orders</h1>
-        <table border="1" style="width:100%; border-collapse: collapse;">
-            <tr style="background:#ffbc0d">
-                <th>Customer</th><th>Address</th><th>Order Details</th><th>Total</th><th>Status</th>
-            </tr>
-            <?php foreach($orders as $o): ?>
-            <tr>
-                <td><strong><?= htmlspecialchars($o['customer_name']) ?></strong><br><?= $o['phone'] ?></td>
-                <td><?= htmlspecialchars($o['address']) ?></td>
-                <td>
-                    <?php 
-                    $cart = json_decode($o['items'], true);
-                    foreach($cart as $item) echo "• {$item['name']} (x{$item['quantity']})<br>";
-                    ?>
-                </td>
-                <td>₱<?= number_format($o['total_amount'], 2) ?></td>
-                <td>
-                    <select onchange="updateOrderStatus(<?= $o['id'] ?>, this.value)">
-                        <option value="Pending" <?= $o['status']=='Pending'?'selected':'' ?>>Pending</option>
-                        <option value="Preparing" <?= $o['status']=='Preparing'?'selected':'' ?>>Preparing</option>
-                        <option value="Delivered" <?= $o['status']=='Delivered'?'selected':'' ?>>Delivered</option>
-                    </select>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
-    </div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1><i class="fas fa-truck-loading"></i> Incoming Orders</h1>
+            <button onclick="location.reload()" class="btn-refresh">
+                <i class="fas fa-sync-alt"></i> Refresh List
+            </button>
+        </header>
+
+        <section class="order-container">
+            <?php if (empty($orders)): ?>
+                <div class="no-orders">
+                    <i class="fas fa-receipt fa-3x"></i>
+                    <p>No orders yet. They will appear here when customers check out.</p>
+                </div>
+            <?php else: ?>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Time</th>
+                            <th>Customer Info</th>
+                            <th>Items Ordered</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($orders as $order): ?>
+                        <tr class="status-row-<?php echo strtolower($order['status']); ?>">
+                            <td>#<?php echo $order['id']; ?></td>
+                            <td><?php echo date('h:i A', strtotime($order['created_at'])); ?></td>
+                            <td>
+                                <strong><?php echo htmlspecialchars($order['customer_name']); ?></strong><br>
+                                <small><i class="fas fa-phone"></i> <?php echo htmlspecialchars($order['phone']); ?></small><br>
+                                <small><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($order['address']); ?></small>
+                            </td>
+                            <td>
+                                <ul class="item-summary-list">
+                                    <?php 
+                                    $cartItems = json_decode($order['items'], true);
+                                    if (is_array($cartItems)) {
+                                        foreach ($cartItems as $item) {
+                                            echo "<li>" . htmlspecialchars($item['name']) . " <span>x" . $item['quantity'] . "</span></li>";
+                                        }
+                                    }
+                                    ?>
+                                </ul>
+                            </td>
+                            <td class="order-price">₱<?php echo number_format($order['total_amount'], 2); ?></td>
+                            <td>
+                                <select onchange="updateOrderStatus(<?php echo $order['id']; ?>, this.value)" 
+                                        class="status-dropdown <?php echo strtolower($order['status']); ?>">
+                                    <option value="Pending" <?php echo $order['status'] == 'Pending' ? 'selected' : ''; ?>>🕒 Pending</option>
+                                    <option value="Preparing" <?php echo $order['status'] == 'Preparing' ? 'selected' : ''; ?>>🍳 Preparing</option>
+                                    <option value="Delivered" <?php echo $order['status'] == 'Delivered' ? 'selected' : ''; ?>>✅ Delivered</option>
+                                    <option value="Cancelled" <?php echo $order['status'] == 'Cancelled' ? 'selected' : ''; ?>>❌ Cancelled</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+        </section>
+    </main>
+
     <script src="/scripts/app.js"></script>
 </body>
 </html>
