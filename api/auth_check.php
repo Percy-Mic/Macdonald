@@ -3,12 +3,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if the staff_id is NOT in the session
+// Redirect if NOT logged in
 if (!isset($_SESSION['staff_id'])) {
-    // Only redirect if the current page isn't already the login page
-    if (basename($_SERVER['PHP_SELF']) !== 'login.php') {
-        header("Location: /admin/login");
-        exit();
-    }
+    // We use root-relative paths for Vercel
+    header("Location: /admin/login");
+    exit();
 }
 ?>
