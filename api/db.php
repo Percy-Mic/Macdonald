@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 $host = "mysql-62ea972-percymicnono-12e0.g.aivencloud.com";
 $port = "18500"; 
