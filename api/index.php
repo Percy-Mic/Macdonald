@@ -1,4 +1,15 @@
-<?php include 'db.php'; ?>
+<?php
+include 'db.php'; // Ensure db.php is in the same api folder
+
+// Fetch items from the menu_items table
+try {
+    $stmt = $pdo->query("SELECT * FROM menu_items ORDER BY category ASC");
+    $items = $stmt->fetchAll();
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,55 +17,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>McExpress | Order Now</title>
     <link rel="stylesheet" href="/styles/main.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div id="notification-container" class="notification-area"></div>
 
-    <nav class="navbar">
-        <h1 class="logo">Mc<span>Express</span></h1>
-        <button onclick="toggleCart()" class="cart-trigger">
-            <i class="fas fa-shopping-basket"></i>
-            <span id="cart-count">0</span>
-        </button>
-    </nav>
+<header class="navbar">
+    <div class="logo">Mc<span>Express</span></div>
+    <div class="cart-icon" onclick="toggleCart()">
+        <i class="fas fa-shopping-basket"></i>
+        <span id="cart-count">0</span>
+    </div>
+</header>
 
-    <main class="grid-container">
-        <?php
-        $stmt = $pdo->query("SELECT * FROM menu_items ORDER BY id DESC");
-        while ($row = $stmt->fetch()) {
-            echo "
-            <div class='card'>
-                <img src='{$row['image_url']}' alt='{$row['name']}'>
-                <div class='card-info'>
-                    <h3>{$row['name']}</h3>
-                    <p class='category'>{$row['category']}</p>
-                    <p class='price'>\${$row['price']}</p>
-                    <button onclick=\"addToCart({$row['id']}, '{$row['name']}', {$row['price']})\">Add to Cart</button>
-                </div>
-            </div>";
-        }
-        ?>
-    </main>
-
-    <aside id="cart-sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <div id="cart-section" class="cart-container">
-                <h2>Your Order</h2>
-                <div id="cart-items"></div> <hr>
-    
-                <div id="checkout-form">
-                    <h3>Delivery Details</h3>
-                    <input type="text" id="cust_name" placeholder="Full Name" required>
-                    <input type="text" id="cust_phone" placeholder="Phone Number" required>
-                    <textarea id="cust_address" placeholder="Complete Address" required></textarea>
-                    <div class="total-display">Total: ₱<span id="cart-total">0.00</span></div>
-                    <button onclick="placeOrder()" class="place-order-btn">Confirm Order</button>
+<main class="container">
+    <section class="menu-grid">
+        <?php foreach ($items as $item): ?>
+            <div class="product-card">
+                <img src="<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
+                <div class="card-info">
+                    <h3><?php echo htmlspecialchars($item['name']); ?></h3>
+                    <p class="category"><?php echo htmlspecialchars($item['category']); ?></p>
+                    <p class="price">₱<?php echo number_format($item['price'], 2); ?></p>
+                    <button class="add-btn" onclick="addToCart(<?php echo $item['id']; ?>, '<?php echo addslashes($item['name']); ?>', <?php echo $item['price']; ?>)">
+                        Add to Cart
+                    </button>
                 </div>
             </div>
+        <?php endforeach; ?>
+    </section>
+
+    <aside id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Your Order</h2>
+            <button class="close-btn" onclick="toggleCart()">&times;</button>
+        </div>
+        
+        <div id="cart-items-list">
+            </div>
+
+        <div class="checkout-section">
+            <h3>Delivery Details</h3>
+            <input type="text" id="cust_name" placeholder="Full Name" required>
+            <input type="text" id="cust_phone" placeholder="Phone Number" required>
+            <textarea id="cust_address" placeholder="Complete Delivery Address" required></textarea>
+            
+            <div class="total-bar">
+                <span>Total:</span>
+                <span id="cart-total-display">₱0.00</span>
+            </div>
+            
+            <button class="confirm-btn" onclick="placeOrder()">Confirm Order</button>
         </div>
     </aside>
+</main>
 
-    <script src="/scripts/app.js"></script>
+<script src="/scripts/app.js"></script>
 </body>
 </html>
