@@ -104,6 +104,34 @@ async function savePrice(id) {
     }
 }
 
+async function placeOrder() {
+    const orderData = {
+        name: document.getElementById('cust_name').value,
+        phone: document.getElementById('cust_phone').value,
+        address: document.getElementById('cust_address').value,
+        cart: cart, // Assuming your cart array is defined here
+        total: calculateTotal() 
+    };
+
+    if(!orderData.name || !orderData.address) {
+        alert("Please fill in delivery details!");
+        return;
+    }
+
+    const response = await fetch('/api/place_order.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+    });
+
+    const result = await response.json();
+    if(result.success) {
+        alert("Order Received! Preparing your meal...");
+        cart = []; // Clear cart
+        location.reload();
+    }
+}
+
 // Client Reminder Logic
 if (document.title.includes("Order Now")) {
     setTimeout(() => {
