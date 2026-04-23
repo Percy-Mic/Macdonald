@@ -11,4 +11,12 @@
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ]
+  
+  /*"routes": [
+    { "src": "/admin/login", "dest": "/api/login.php" },
+    { "src": "/admin/products", "dest": "/api/admin_products.php" },
+    { "src": "/admin/orders", "dest": "/api/admin_orders.php" },
+    { "src": "/admin/staff", "dest": "/api/admin_staff.php" },
+    { "src": "/logout", "dest": "/api/logout.php" }
+  ]*/
 }
