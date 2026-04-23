@@ -5,7 +5,7 @@
     }
   },
   "routes": [
-    /* 1. ALLOW DIRECT ACCESS TO STATIC ASSETS FIRST *
+    /* 1. ALLOW DIRECT ACCESS TO STATIC ASSETS FIRST */
     { "handle": "filesystem" },
 
     /* 2. SPECIFIC CLEAN URLS FOR ADMIN */
