@@ -1,14 +1,14 @@
-<?php 
-// 1. Protection & Connection
-include 'auth_check.php'; 
+<?php
+// Ensure NO space or empty line exists before this opening tag
+include 'auth_check.php'; // This MUST be the first include
 include 'db.php';
 
-// 2. Fetch Orders (Newest First)
+// Fetch orders from MySQL
 try {
     $stmt = $pdo->query("SELECT * FROM orders ORDER BY created_at DESC");
     $orders = $stmt->fetchAll();
 } catch (PDOException $e) {
-    die("Error fetching orders: " . $e->getMessage());
+    $orders = [];
 }
 ?>
 
