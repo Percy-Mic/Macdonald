@@ -1,7 +1,6 @@
 <?php
-
-include 'auth_check.php';
-include 'db.php';
+require_once __DIR__ . '/auth_check.php';
+require_once __DIR__ . '/db.php';
 
 try {
     $stmt = $pdo->query("SELECT * FROM orders ORDER BY created_at DESC");
