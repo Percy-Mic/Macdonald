@@ -9,7 +9,6 @@
     { "src": "/styles/(.*)", "dest": "/styles/$1" },
     { "src": "/scripts/(.*)", "dest": "/scripts/$1" },
     
-    /* ADD THIS LINE: It tells Vercel to stop looking if the file exists physically */
     { "handle": "filesystem" },
 
     { "src": "/admin/login", "dest": "/api/login.php" },
