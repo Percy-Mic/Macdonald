@@ -27,6 +27,10 @@
       "dest": "/api/admin_orders.php"
     },
     {
+      "src": "/admin/setup",
+      "dest": "/api/setup.php"
+    },
+    {
       "src": "/admin/staff",
       "dest": "/api/admin_staff.php"
     },
