@@ -1,12 +1,13 @@
 <?php
-include 'db.php'; // Ensure db.php is in the same api folder
+include 'db.php'; // Database connection
 
-// Fetch items from the menu_items table
+// Fetch products from the database
 try {
     $stmt = $pdo->query("SELECT * FROM menu_items ORDER BY category ASC");
     $items = $stmt->fetchAll();
 } catch (PDOException $e) {
-    die("Database error: " . $e->getMessage());
+    // In a production environment, log this instead of echoing
+    die("Error fetching products: " . $e->getMessage());
 }
 ?>
 
