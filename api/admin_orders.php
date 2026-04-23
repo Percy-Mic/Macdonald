@@ -2,7 +2,6 @@
 include 'auth_check.php';
 include 'db.php';
 
-// Fetch orders from MySQL
 try {
     $stmt = $pdo->query("SELECT * FROM orders ORDER BY created_at DESC");
     $orders = $stmt->fetchAll();
