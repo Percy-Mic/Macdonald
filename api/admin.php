@@ -18,7 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_item'])) {
         $message = "Error: " . $e->getMessage();
     }
 }
-
+// Fetch all orders, newest first
+$orders = $pdo->query("SELECT * FROM orders ORDER BY created_at DESC")->fetchAll();
 // Fetch current items
 $items = $pdo->query("SELECT * FROM menu_items ORDER BY created_at DESC")->fetchAll();
 ?>
