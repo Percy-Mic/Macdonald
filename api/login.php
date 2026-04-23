@@ -1,7 +1,10 @@
 <?php
 // 1. Session must be the absolute first thing. 
 // No spaces, no HTML, no echoes before this.
-session_start();
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include 'db.php'; 
 
 // 2. Break the loop: If already logged in, go to orders.
