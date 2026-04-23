@@ -104,6 +104,10 @@ async function savePrice(id) {
     }
 }
 
+function calculateTotal() {
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
 async function placeOrder() {
     const orderData = {
         name: document.getElementById('cust_name').value,
