@@ -96,6 +96,54 @@ $items = $pdo->query("SELECT * FROM menu_items ORDER BY created_at DESC")->fetch
         </table>
     </section>
 
+    <section class="admin-orders">
+        <h2>Incoming Orders</h2>
+        <table border="1" class="order-table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Customer</th>
+                    <th>Details</th>
+                    <th>Order Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($orders as $order): ?>
+                <tr>
+                    <td><?php echo date('M d, h:i A', strtotime($order['created_at'])); ?></td>
+                    <td>
+                        <strong><?php echo htmlspecialchars($order['customer_name']); ?></strong><br>
+                        <small><?php echo htmlspecialchars($order['phone']); ?></small>
+                    </td>
+                    <td><?php echo htmlspecialchars($order['address']); ?></td>
+                    <td>
+                        <ul class="order-item-list">
+                            <?php 
+                            $items = json_decode($order['items'], true);
+                            foreach ($items as $item): 
+                            ?>
+                                <li><?php echo $item['name']; ?> (x<?php echo $item['quantity']; ?>)</li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </td>
+                    <td>₱<?php echo number_format($order['total_amount'], 2); ?></td>
+                    <td>
+                        <select onchange="updateOrderStatus(<?php echo $order['id']; ?>, this.value)" 
+                            class="status-select <?php echo strtolower($order['status']); ?>">
+                            <option value="Pending" <?php if($order['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
+                            <option value="Preparing" <?php if($order['status'] == 'Preparing') echo 'selected'; ?>>Preparing</option>
+                            <option value="Delivered" <?php if($order['status'] == 'Delivered') echo 'selected'; ?>>Delivered</option>
+                            <option value="Cancelled" <?php if($order['status'] == 'Cancelled') echo 'selected'; ?>>Cancelled</option>
+                        </select>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </section>
+
     <script src="/scripts/app.js"></script>
 </body>
 </html>
