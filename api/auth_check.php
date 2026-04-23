@@ -1,14 +1,13 @@
 <?php
-// Ensure session is started before checking variables
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if the ID is missing
+// Check if the user is NOT logged in
 if (!isset($_SESSION['staff_id'])) {
-    // Redirect ONLY if we aren't already on the login page
-    // Using root-relative path
+    // Force redirect to the clean URL route
     header("Location: /admin/login");
     exit();
 }
+// If they ARE logged in, the script just continues...
 ?>
