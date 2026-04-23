@@ -131,6 +131,19 @@ async function placeOrder() {
         location.reload();
     }
 }
+async function updateOrderStatus(orderId, newStatus) {
+    const response = await fetch('/api/update_order_status.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: orderId, status: newStatus })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+        // Optional: Change the color of the dropdown based on status
+        alert("Order #" + orderId + " updated to " + newStatus);
+    }
+}
 
 // Client Reminder Logic
 if (document.title.includes("Order Now")) {
