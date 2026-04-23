@@ -39,13 +39,19 @@
 
     <aside id="cart-sidebar" class="sidebar">
         <div class="sidebar-header">
-            <h3>Your Order</h3>
-            <button onclick="toggleCart()">&times;</button>
-        </div>
-        <div id="cart-items" class="cart-body"></div>
-        <div class="sidebar-footer">
-            <div class="total-row">Total: <span id="cart-total">$0.00</span></div>
-            <button class="checkout-btn" onclick="processOrder()">Place Order</button>
+            <div id="cart-section" class="cart-container">
+                <h2>Your Order</h2>
+                <div id="cart-items"></div> <hr>
+    
+                <div id="checkout-form">
+                    <h3>Delivery Details</h3>
+                    <input type="text" id="cust_name" placeholder="Full Name" required>
+                    <input type="text" id="cust_phone" placeholder="Phone Number" required>
+                    <textarea id="cust_address" placeholder="Complete Address" required></textarea>
+                    <div class="total-display">Total: ₱<span id="cart-total">0.00</span></div>
+                    <button onclick="placeOrder()" class="place-order-btn">Confirm Order</button>
+                </div>
+            </div>
         </div>
     </aside>
 
