@@ -1,24 +1,14 @@
 <?php
-// Start the session to access stored login data
+// Ensure session is started before checking variables
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-/**
- * Check if the user is NOT logged in.
- * We check for 'staff_id' because we set this in login.php 
- * upon a successful password match.
- */
+// Check if the ID is missing
 if (!isset($_SESSION['staff_id'])) {
-    // Redirect to the login page using the clean URL from vercel.json
+    // Redirect ONLY if we aren't already on the login page
+    // Using root-relative path
     header("Location: /admin/login");
-    exit(); // Always call exit after a header redirect
+    exit();
 }
-
-/**
- * Optional: Helper variables to use across admin pages
- * This makes it easier to display "Welcome, Percy" in your sidebar.
- */
-$current_user = $_SESSION['staff_username'] ?? 'Staff';
-$current_role = $_SESSION['role'] ?? 'Staff';
 ?>
