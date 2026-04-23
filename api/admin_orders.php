@@ -1,5 +1,5 @@
 <?php
-//include
+
 include 'auth_check.php';
 include 'db.php';
 
