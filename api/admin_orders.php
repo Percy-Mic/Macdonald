@@ -1,6 +1,5 @@
 <?php
-// Ensure NO space or empty line exists before this opening tag
-include 'auth_check.php'; // This MUST be the first include
+include 'auth_check.php';
 include 'db.php';
 
 // Fetch orders from MySQL
