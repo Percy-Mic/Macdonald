@@ -23,3 +23,4 @@ try {
     error_log("Connection failed: " . $e->getMessage());
     die("Database connection error. Please check SSL settings.");
 }
+?>
