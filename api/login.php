@@ -1,57 +1,31 @@
 <?php
-/**
- * 1. PRE-OUTPUT LOGIC
- * No spaces, HTML, or BOM characters should exist before this opening tag.
- */
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once __DIR__ . '/db.php';
 
-/**
- * 2. REDIRECT LOOP PREVENTION
- * If the user already has a session, push them to the dashboard immediately.
- */
+// ONLY redirect if the session is confirmed
 if (isset($_SESSION['staff_id'])) {
     header("Location: /admin/orders");
     exit();
 }
 
 $error = "";
-
-/**
- * 3. AUTHENTICATION LOGIC
- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_input = trim($_POST['username'] ?? '');
+    $user_input = $_POST['username'] ?? '';
     $pass_input = $_POST['password'] ?? '';
 
-    try {
-        $stmt = $pdo->prepare("SELECT id, username, password, role FROM staff WHERE username = ?");
-        $stmt->execute([$user_input]);
-        $user = $stmt->fetch();
+    $stmt = $pdo->prepare("SELECT id, username, password FROM staff WHERE username = ?");
+    $stmt->execute([$user_input]);
+    $user = $stmt->fetch();
 
-        // Verify password against the hash in the database
-        if ($user && password_verify($pass_input, $user['password'])) {
-            
-            // Security: Prevent session fixation
-            session_regenerate_id(true);
-            
-            $_SESSION['staff_id'] = $user['id'];
-            $_SESSION['staff_username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-
-            // Redirect using the clean route defined in vercel.json
-            header("Location: /admin/orders");
-            exit();
-        } else {
-            $error = "Invalid username or password.";
-        }
-    } catch (PDOException $e) {
-        error_log("Login Error: " . $e->getMessage());
-        $error = "A system error occurred. Please try again later.";
+    if ($user && password_verify($pass_input, $user['password'])) {
+        session_regenerate_id(true);
+        $_SESSION['staff_id'] = $user['id'];
+        header("Location: /admin/orders");
+        exit();
+    } else {
+        $error = "Invalid credentials.";
     }
 }
 ?>
