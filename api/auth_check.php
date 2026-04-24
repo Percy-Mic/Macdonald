@@ -3,11 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if staff_id is missing AND we are not already on the login page
+// Check if staff is NOT logged in
 if (!isset($_SESSION['staff_id'])) {
-    // Get the current path to prevent looping on the login page itself
-    $current_uri = $_SERVER['REQUEST_URI'];
-    if (strpos($current_uri, '/admin/login') === false) {
+    // Only redirect if we are NOT already on the login page
+    // Using strpos to check the URL path
+    if (strpos($_SERVER['REQUEST_URI'], '/admin/login') === false) {
         header("Location: /admin/login");
         exit();
     }
