@@ -6,7 +6,10 @@ require_once __DIR__ . '/db.php';
 
 // ONLY redirect if the session is confirmed
 if (isset($_SESSION['staff_id'])) {
-    header("Location: /admin/orders");
+    // Replace your header("Location: /admin/orders") with this:
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+    $host = $_SERVER['HTTP_HOST'];
+    header("Location: $protocol://$host/admin/orders");
     exit();
 }
 
