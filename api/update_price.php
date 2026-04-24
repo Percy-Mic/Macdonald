@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 include 'db.php';
 
 // Get the data sent from the JavaScript fetch
-$data = json_json_decode(file_get_contents('php://input'), true);
+$data = json_decode(file_get_contents('php://input'), true);
 
 if (isset($data['id']) && isset($data['price'])) {
     try {
