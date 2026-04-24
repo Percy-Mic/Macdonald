@@ -3,11 +3,13 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// 1. Get the current URL path
 $current_uri = $_SERVER['REQUEST_URI'];
 
-// BREAK THE LOOP: If we are not logged in AND not already on the login page, redirect.
+// 2. ONLY redirect if the user is NOT logged in AND is NOT already on the login page
 if (!isset($_SESSION['staff_id'])) {
-    if (strpos($current_uri, '/admin/login') === false) {
+    // Check if the current URL contains 'login'
+    if (strpos($current_uri, '/admin/login') === false && strpos($current_uri, 'login.php') === false) {
         header("Location: /admin/login");
         exit();
     }
