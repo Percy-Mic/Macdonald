@@ -19,13 +19,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$user_input]);
     $user = $stmt->fetch();
 
-    if ($user && password_verify($pass_input, $user['password'])) {
-        session_regenerate_id(true);
-        // Inside login.php after password_verify is true:
-        $_SESSION['staff_id'] = $user['id'];
-        header("Location: /admin/orders"); // Use the route, not the .php file
-        exit();
-    } else {
+   // Inside your POST logic in login.php
+if ($user && password_verify($pass_input, $user['password'])) {
+    session_regenerate_id(true);
+    $_SESSION['staff_id'] = $user['id'];
+    
+    // Use the clean route from vercel.json
+    header("Location: /admin/orders"); 
+    exit();
+} else {
         $error = "Invalid credentials.";
     }
 }
