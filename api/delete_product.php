@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json');
 require_once __DIR__ . '/auth_check.php';
 include 'db.php';
 $id = $_GET['id'];
