@@ -21,8 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && password_verify($pass_input, $user['password'])) {
         session_regenerate_id(true);
+        // Inside login.php after password_verify is true:
         $_SESSION['staff_id'] = $user['id'];
-        header("Location: /admin/orders");
+        header("Location: /admin/orders"); // Use the route, not the .php file
         exit();
     } else {
         $error = "Invalid credentials.";
