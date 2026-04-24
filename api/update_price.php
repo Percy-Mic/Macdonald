@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once __DIR__ . '/auth_check.php';
 include 'db.php';
 
 // Get the data sent from the JavaScript fetch
