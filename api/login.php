@@ -1,13 +1,19 @@
 <?php
-// 1. Session must be the absolute first thing. 
-// No spaces, no HTML, no echoes before this.
+/**
+ * 1. PRE-OUTPUT LOGIC
+ * No spaces, HTML, or BOM characters should exist before this opening tag.
+ */
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include 'db.php'; 
 
-// 2. Break the loop: If already logged in, go to orders.
+require_once __DIR__ . '/db.php';
+
+/**
+ * 2. REDIRECT LOOP PREVENTION
+ * If the user already has a session, push them to the dashboard immediately.
+ */
 if (isset($_SESSION['staff_id'])) {
     header("Location: /admin/orders");
     exit();
@@ -15,35 +21,37 @@ if (isset($_SESSION['staff_id'])) {
 
 $error = "";
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $user_input = $_POST['username'] ?? '';
+/**
+ * 3. AUTHENTICATION LOGIC
+ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_input = trim($_POST['username'] ?? '');
     $pass_input = $_POST['password'] ?? '';
 
     try {
-        // Query the MySQL staff table
         $stmt = $pdo->prepare("SELECT id, username, password, role FROM staff WHERE username = ?");
         $stmt->execute([$user_input]);
         $user = $stmt->fetch();
 
-        // Use password_verify to check against the hash in MySQL
+        // Verify password against the hash in the database
         if ($user && password_verify($pass_input, $user['password'])) {
             
-            // Clean up the old session and start a fresh one for security
+            // Security: Prevent session fixation
             session_regenerate_id(true);
             
             $_SESSION['staff_id'] = $user['id'];
             $_SESSION['staff_username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
 
-            // Redirect to the clean route defined in vercel.json
+            // Redirect using the clean route defined in vercel.json
             header("Location: /admin/orders");
             exit();
         } else {
             $error = "Invalid username or password.";
         }
     } catch (PDOException $e) {
-        error_log($e->getMessage());
-        $error = "A system error occurred. Please try again.";
+        error_log("Login Error: " . $e->getMessage());
+        $error = "A system error occurred. Please try again later.";
     }
 }
 ?>
@@ -57,70 +65,70 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <style>
         :root { --mcd-red: #db0007; --mcd-yellow: #ffbc0d; }
         body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            background: #f4f4f4; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f8f9fa; 
             display: flex; justify-content: center; align-items: center; 
             height: 100vh; margin: 0; 
         }
         .login-card { 
             background: #fff; padding: 40px; border-radius: 12px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
+            width: 100%; max-width: 380px; text-align: center;
         }
-        .logo { font-size: 2.2rem; font-weight: 800; color: var(--mcd-red); margin-bottom: 5px; }
-        .logo span { color: var(--mcd-yellow); }
-        .subtitle { color: #666; margin-bottom: 30px; font-size: 0.9rem; }
+        .brand { font-size: 2.2rem; font-weight: 800; color: var(--mcd-red); margin-bottom: 5px; }
+        .brand span { color: var(--mcd-yellow); }
+        .subtitle { color: #6c757d; margin-bottom: 30px; font-size: 0.9rem; }
         
-        .form-group { text-align: left; margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #333; }
         .form-group input { 
-            width: 100%; padding: 12px; border: 1px solid #ddd; 
-            border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+            width: 100%; padding: 12px; border: 1px solid #ced4da; 
+            border-radius: 6px; box-sizing: border-box; font-size: 1rem;
         }
-        .form-group input:focus { outline: 2px solid var(--mcd-yellow); border-color: transparent; }
+        .form-group input:focus { outline: none; border-color: var(--mcd-yellow); box-shadow: 0 0 0 3px rgba(255, 188, 13, 0.2); }
         
         .login-btn { 
-            background: var(--mcd-yellow); color: #222; border: none; 
-            width: 100%; padding: 14px; border-radius: 8px; 
-            font-weight: bold; font-size: 1rem; cursor: pointer; 
-            transition: transform 0.2s, background 0.2s; 
+            background: var(--mcd-yellow); color: #000; border: none; 
+            width: 100%; padding: 14px; border-radius: 6px; 
+            font-weight: 700; font-size: 1rem; cursor: pointer; 
+            transition: all 0.2s ease; margin-top: 10px;
         }
-        .login-btn:hover { background: #e5a80b; transform: translateY(-1px); }
+        .login-btn:hover { background: #e5a80b; }
         
-        .error-msg { 
-            background: #ffebee; color: #c62828; padding: 12px; 
-            border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;
+        .error-box { 
+            background: #f8d7da; color: #842029; padding: 10px; 
+            border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .back-link { margin-top: 25px; display: block; color: #888; text-decoration: none; font-size: 0.85rem; }
-        .back-link:hover { color: var(--mcd-red); }
+        .back-home { margin-top: 20px; display: block; color: #6c757d; text-decoration: none; font-size: 0.85rem; }
+        .back-home:hover { color: var(--mcd-red); }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <div class="logo">Mc<span>Express</span></div>
-    <div class="subtitle">Internal Staff Portal</div>
+    <div class="brand">Mc<span>Express</span></div>
+    <div class="subtitle">Staff Management Portal</div>
 
     <?php if ($error): ?>
-        <div class="error-msg">
-            <i class="fas fa-exclamation-circle"></i> <?php echo $error; ?>
+        <div class="error-box">
+            <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
         </div>
     <?php endif; ?>
 
     <form method="POST" action="/admin/login">
         <div class="form-group">
-            <label>Username</label>
-            <input type="text" name="username" required placeholder="Enter your username" autocomplete="username">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required placeholder="Enter username" autocomplete="username">
         </div>
         <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required placeholder="Enter password" autocomplete="current-password">
         </div>
         <button type="submit" class="login-btn">Log In to Dashboard</button>
     </form>
     
-    <a href="/" class="back-link">
+    <a href="/" class="back-home">
         <i class="fas fa-arrow-left"></i> Return to Storefront
     </a>
 </div>
