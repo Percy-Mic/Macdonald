@@ -73,7 +73,8 @@ async function deleteProduct(id) {
 
 // UPDATE PRICE FUNCTION
 async function updatePrice(id) {
-    const input = document.querySelector(`.price-input[data-id='${id}']`);
+    const input = document.getElementById('price-input-${id}')
+    
     const newPrice = input.value;
 
     const response = await fetch('/api/update_price.php', {
@@ -84,23 +85,6 @@ async function updatePrice(id) {
 
     if (response.ok) {
         alert('Price updated!');
-    }
-}
-
-async function savePrice(id) {
-    const newPrice = document.getElementById(`price-${id}`).value;
-
-    const response = await fetch('/api/update_price.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id, price: newPrice })
-    });
-
-    const result = await response.json();
-    if (result.success) {
-        alert("Price updated successfully!");
-    } else {
-        alert("Error: " + result.error);
     }
 }
 
