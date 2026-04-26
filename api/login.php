@@ -1,37 +1,35 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once __DIR__ . '/db.php';
+include_once 'db.php';
 
-// ONLY redirect if the session is confirmed
-if (isset($_SESSION['staff_id'])) {
-    // Replace your header("Location: /admin/orders") with this:
-    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-    $host = $_SERVER['HTTP_HOST'];
-    header("Location: $protocol://$host/admin/orders");
-    exit();
-}
+$error = '';
 
-$error = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_input = $_POST['username'] ?? '';
-    $pass_input = $_POST['password'] ?? '';
+    $username = $_POST['username'] ?? '';
+    $password_input = $_POST['password'] ?? '';
 
-    $stmt = $pdo->prepare("SELECT id, username, password FROM staff WHERE username = ?");
-    $stmt->execute([$user_input]);
+    $stmt = $pdo->prepare("SELECT id, password FROM staff WHERE username = ?");
+    $stmt->execute([$username]);
     $user = $stmt->fetch();
 
-   // Inside your POST logic in login.php
-if ($user && password_verify($pass_input, $user['password'])) {
-    session_regenerate_id(true);
-    $_SESSION['staff_id'] = $user['id'];
-    
-    // Use the clean route from vercel.json
-    header("Location: /admin/orders"); 
-    exit();
-} else {
-        $error = "Invalid credentials.";
+    if ($user && password_verify($password_input, $user['password'])) {
+        $token = bin2hex(random_bytes(32));
+        $expires = date('Y-m-d H:i:s', strtotime('+30 days'));
+
+        $stmt = $pdo->prepare("INSERT INTO staff_sessions (staff_id, token, expires_at) VALUES (?, ?, ?)");
+        $stmt->execute([$user['id'], $token, $expires]);
+
+        setcookie("auth_token", $token, [
+            'expires' => time() + (86400 * 30),
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+
+        header("Location: /admin/orders");
+        exit();
+    } else {
+        $error = "Invalid username or password.";
     }
 }
 ?>
@@ -40,77 +38,126 @@ if ($user && password_verify($pass_input, $user['password'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Login | McExpress</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>McExpress | Admin Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --mcd-red: #db0007; --mcd-yellow: #ffbc0d; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #f8f9fa; 
-            display: flex; justify-content: center; align-items: center; 
-            height: 100vh; margin: 0; 
+        :root {
+            --primary-color: #ffc107; /* McDonald's-style Yellow */
+            --secondary-color: #bd0017; /* McDonald's-style Red */
+            --bg-color: #f8f9fa;
         }
-        .login-card { 
-            background: #fff; padding: 40px; border-radius: 12px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
-            width: 100%; max-width: 380px; text-align: center;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        .brand { font-size: 2.2rem; font-weight: 800; color: var(--mcd-red); margin-bottom: 5px; }
-        .brand span { color: var(--mcd-yellow); }
-        .subtitle { color: #6c757d; margin-bottom: 30px; font-size: 0.9rem; }
-        
-        .form-group { text-align: left; margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #333; }
-        .form-group input { 
-            width: 100%; padding: 12px; border: 1px solid #ced4da; 
-            border-radius: 6px; box-sizing: border-box; font-size: 1rem;
+
+        .login-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
         }
-        .form-group input:focus { outline: none; border-color: var(--mcd-yellow); box-shadow: 0 0 0 3px rgba(255, 188, 13, 0.2); }
-        
-        .login-btn { 
-            background: var(--mcd-yellow); color: #000; border: none; 
-            width: 100%; padding: 14px; border-radius: 6px; 
-            font-weight: 700; font-size: 1rem; cursor: pointer; 
-            transition: all 0.2s ease; margin-top: 10px;
+
+        .login-header i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
         }
-        .login-btn:hover { background: #e5a80b; }
-        
-        .error-box { 
-            background: #f8d7da; color: #842029; padding: 10px; 
-            border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+
+        .login-header h2 {
+            margin: 0 0 1.5rem 0;
+            color: #333;
+            font-weight: 700;
         }
-        .back-home { margin-top: 20px; display: block; color: #6c757d; text-decoration: none; font-size: 0.85rem; }
-        .back-home:hover { color: var(--mcd-red); }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover {
+            background-color: #a00014;
+        }
+
+        .error-msg {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
 
-<div class="login-card">
-    <div class="brand">Mc<span>Express</span></div>
-    <div class="subtitle">Staff Management Portal</div>
+<div class="login-container">
+    <div class="login-header">
+        <i class="fas fa-utensils"></i>
+        <h2>McExpress Admin</h2>
+    </div>
 
     <?php if ($error): ?>
-        <div class="error-box">
-            <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
+        <div class="error-msg">
+            <i class="fas fa-exclamation-circle"></i> <?php echo $error; ?>
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="/admin/login">
+    <form method="POST">
         <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required placeholder="Enter username" autocomplete="username">
+            <label>Username</label>
+            <input type="text" name="username" required placeholder="Enter username">
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required placeholder="Enter password" autocomplete="current-password">
+            <label>Password</label>
+            <input type="password" name="password" required placeholder="Enter password">
         </div>
-        <button type="submit" class="login-btn">Log In to Dashboard</button>
+        <button type="submit" class="btn-login">Sign In</button>
     </form>
-    
-    <a href="/" class="back-home">
-        <i class="fas fa-arrow-left"></i> Return to Storefront
-    </a>
 </div>
 
 </body>
