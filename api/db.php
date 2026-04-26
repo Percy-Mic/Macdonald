@@ -10,11 +10,11 @@ try {
     $options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::MYSQL_ATTR_SSL_CA => null, // Required for Aiven
-        1014 => false // MYSQL_ATTR_SSL_VERIFY_SERVER_CERT
+        PDO::MYSQL_ATTR_SSL_CA => null,
+        1014 => false // Equivalent to PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT
     ];
     $pdo = new PDO($dsn, $user, $password, $options);
 } catch (PDOException $e) {
     error_log($e->getMessage());
-    exit("Database connection failed.");
+    exit("Connection error.");
 }
