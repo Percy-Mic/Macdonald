@@ -1,16 +1,24 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+include_once 'db.php';
+
+$token = $_COOKIE['auth_token'] ?? null;
+$is_logged_in = false;
+
+if ($token) {
+    // Check if the token exists in Aiven and hasn't expired
+    $stmt = $pdo->prepare("SELECT staff_id FROM staff_sessions WHERE token = ? AND expires_at > NOW()");
+    $stmt->execute([$token]);
+    $session = $stmt->fetch();
+    
+    if ($session) {
+        $is_logged_in = true;
+        $staff_id = $session['staff_id'];
+    }
 }
 
-// Get the current URL path
-$current_uri = $_SERVER['REQUEST_URI'];
-
-// Only redirect if NOT logged in AND NOT already on the login page
-if (!isset($_SESSION['staff_id'])) {
-    // Check for both the clean route and the physical file name
-    if (strpos($current_uri, '/admin/login') === false && strpos($current_uri, 'login.php') === false) {
-        header("Location: /admin/login");
-        exit();
-    }
+// Redirect logic
+$current_page = basename($_SERVER['PHP_SELF']);
+if (!$is_logged_in && $current_page !== 'login.php') {
+    header("Location: /admin/login");
+    exit();
 }
