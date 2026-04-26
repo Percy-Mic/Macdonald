@@ -7,20 +7,14 @@ $password = getenv('dbPass');
 
 try {
     $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
-    
     $options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        // Use the CA => null trick since the constant failed
-        PDO::MYSQL_ATTR_SSL_CA => null,
-        // If the constant above still fails, we use the raw integer for 'REQUIRED' (which is 1)
-        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false 
+        PDO::MYSQL_ATTR_SSL_CA => null, // Required for Aiven
+        1014 => false // MYSQL_ATTR_SSL_VERIFY_SERVER_CERT
     ];
-
     $pdo = new PDO($dsn, $user, $password, $options);
-
 } catch (PDOException $e) {
-    error_log("Connection failed: " . $e->getMessage());
-    die("Database connection error. Please check SSL settings.");
+    error_log($e->getMessage());
+    exit("Database connection failed.");
 }
-?>
