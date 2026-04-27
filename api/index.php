@@ -196,6 +196,10 @@ try {
                 <span id="cart-total">₱0.00</span>
             </div>
             <div class="checkout-form">
+                <div id="receipt_section" style="display:none; margin-bottom: 10px;">
+                    <label style="font-size: 0.8rem; color: #666;">Upload Receipt / Screenshot:</label>
+                    <input type="file" id="receipt_file" accept="image/*">
+                </div>
                 <input type="text" id="cust_name" placeholder="Full Name" required>
                 <input type="tel" id="cust_phone" placeholder="Phone Number" required>
                 <textarea id="cust_address" placeholder="Delivery Address" required></textarea>
@@ -210,6 +214,11 @@ let cart = [];
 
 function toggleCart() {
     document.getElementById('cart-sidebar').classList.toggle('active');
+}
+
+function toggleReceiptUpload() {
+    const method = document.getElementById('payment_method').value;
+    document.getElementById('receipt_section').style.display = (method === 'GCash') ? 'block' : 'none';
 }
 
 function addToCart(id, name, price) {
@@ -260,28 +269,28 @@ function updateCartUI() {
 function placeOrder() {
     if (cart.length === 0) return alert("Your tray is empty!");
     
-    const orderData = {
-        name: document.getElementById('cust_name').value,
-        phone: document.getElementById('cust_phone').value,
-        address: document.getElementById('cust_address').value,
-        items: JSON.stringify(cart),
-        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    };
+    const formData = new FormData();
+    formData.append('name', document.getElementById('cust_name').value);
+    formData.append('phone', document.getElementById('cust_phone').value);
+    formData.append('address', document.getElementById('cust_address').value);
+    formData.append('payment_method', document.getElementById('payment_method').value);
+    formData.append('items', JSON.stringify(cart));
+    formData.append('total', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0));
 
-    if (!orderData.name || !orderData.address) return alert("Please fill in delivery info!");
+    // Append receipt if GCash was selected
+    const receiptInput = document.getElementById('receipt_file');
+    if (receiptInput.files.length > 0) {
+        formData.append('receipt', receiptInput.files[0]);
+    }
 
-    // Send to your backend
     fetch('api/place_order.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(orderData)
+        body: formData // Note: Don't set Content-Type header manually when using FormData
     })
     .then(res => res.json())
     .then(data => {
-        alert("Order placed! Your Order ID is #" + data.id);
-        cart = [];
-        updateCartUI();
-        toggleCart();
+        alert("Order #" + data.id + " placed via " + data.method + "!");
+        location.reload();
     });
 }
 </script>
