@@ -188,6 +188,13 @@ try {
                             </td>
                             <td class="total-amount">₱<?php echo number_format($order['total_amount'], 2); ?></td>
                             <td>
+                                <strong><?= $order['payment_method'] ?></strong><?php if ($order['receipt_url']): ?>
+                                <br>
+                                <a href="<?= $order['receipt_url'] ?>" target="_blank" style="color: blue; font-size: 0.8rem;">
+                                <i class="fas fa-image"></i> View Receipt</a><?php else: ?><br>
+                                <small style="color: #999;">(Cash Payment)</small><php endif; ?>
+                            </td>
+                            <td>
                                 <select class="status-select status-<?php echo $order['status']; ?>" onchange="updateStatus(<?php echo $order['id']; ?>, this.value)">
                                     <option value="Pending" <?php echo $order['status'] == 'Pending' ? 'selected' : ''; ?>>Pending</option>
                                     <option value="Preparing" <?php echo $order['status'] == 'Preparing' ? 'selected' : ''; ?>>Preparing</option>
